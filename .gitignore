@@ -1,0 +1,4 @@
+*.env
+.prettierrc
+node_modules/
+request.rest

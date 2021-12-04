@@ -1,0 +1,6 @@
+.git.
+*.md
+request.rest
+.prettierrc
+.gitignore
+node_modules
