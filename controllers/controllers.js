@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const User = require("../models/models.js");
 
 const ONE_DAY_MILLISECS = 1000 * 60 * 60 * 24;
 // These functions should be replaced by calls to a database
@@ -50,6 +51,16 @@ exports.signup = async (req, res) => {
       password: hashedPassword,
     };
     storeUser(user);
+
+    const dbUserTest = new User({
+      email: req.body.email,
+      passHash: hashedPassword,
+    });
+    User.create(dbUserTest, (err, data) => {
+      if (err) {
+        res.status(500).send("Error Creating User");
+      }
+    });
 
     // 3. Sign in the user with the credentials they just created.
     const token = jwt.sign({ email: user.email }, process.env.APP_SECRET, {
