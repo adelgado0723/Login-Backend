@@ -6,7 +6,9 @@
   </a>
 </p>
 
-> REST endpoints that support user creation, logging in, querying all users if logged in, and logging out.
+## About
+
+REST endpoints that support user creation, logging in, querying all users if logged in, and logging out.
 
 ## Install
 
@@ -19,6 +21,61 @@ npm install
 ```sh
 npm run start
 ```
+
+## Endpoints
+
+### POST /signup
+
+Creates a new user account if one does not already exist for the given email
+
+**Request Body:**
+
+```JSON
+{
+    "email": "[your_email]",
+    "password": "[your_password]"
+}
+```
+
+**Successful Response Body:**
+Upon success, the errors array will be empty and data.user.email will show the newly added user email
+
+```JSON
+{
+  "errors":null,
+  "data": { "user": {
+                      "email":"[your_email]"
+                      }
+          }
+}
+```
+
+| Field  | Type   | Description                                                             |
+| ------ | ------ | ----------------------------------------------------------------------- |
+| errors | Array  | Contains any errors from the process                                    |
+| data   | Object | Contains newly added user data upon success or null when error(s) occur |
+
+### POST /login
+
+Creates a new user account if one does not already exist for the given email
+
+**Request Body:**
+
+```JSON
+{
+    "email": "[your_email]",
+    "password": "[your_password]"
+}
+```
+
+| Field    | Type   | Description           |
+| -------- | ------ | --------------------- |
+| email    | String | Registered user email |
+| password | String | User password         |
+
+### POST /logout
+
+### GET /users
 
 ## Design and Features
 
@@ -59,38 +116,16 @@ Validating:
 
 ## Dependencies
 
-### [bcrypt](https://www.npmjs.com/package/bcrypt)
-
-- Library for hashing passwords and comparing hashes
-
-### [cookie-parser](https://www.npmjs.com/package/cookie-parser)
-
-- Parses the Cookie header into an object with a key for each cookie name
-
-### [dotenv](https://www.npmjs.com/package/dotenv)
-
-- Allows for storing environment variables in a separate file from the code they are used in to prevent leaking sensitive data
-
-### [express](https://www.npmjs.com/package/express)
-
-- Simple but robust web framework for Node
-
-### [express-validator](https://www.npmjs.com/package/express-validator)
-
-- Utilities to help with sanitation and validation of user input
-
-### [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
-
-- Allows you to encrypt a JSON object with a private key
-- Used for keeping track of user sessions
-
-### [mysql](https://www.npmjs.com/package/mysql)
-
-- Provides the interface for interacting with a MySQL database
-
-### [nodemon](https://www.npmjs.com/package/nodemon)
-
-- Performs hot reloading of the application
+|                                                                      |                                                                                                                              |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| [bcrypt](https://www.npmjs.com/package/bcrypt)                       | Library for hashing passwords and comparing hashes                                                                           |
+| [cookie-parser](https://www.npmjs.com/package/cookie-parser)         | Parses the Cookie header into an object with a key for each cookie name                                                      |
+| [dotenv](https://www.npmjs.com/package/dotenv)                       | Allows for storing environment variables in a separate file from the code they are used in to prevent leaking sensitive data |
+| [express](https://www.npmjs.com/package/express)                     | Simple, robust web framework for Node                                                                                        |
+| [express-validator](https://www.npmjs.com/package/express-validator) | Utilities to help with sanitation and validation of user input                                                               |
+| [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)           | Allows for encrypting a JSON object with a private key. Used for keeping track of user sessions                              |
+| [mysql](https://www.npmjs.com/package/mysql)                         | Provides the interface for interacting with a MySQL database                                                                 |
+| [nodemon](https://www.npmjs.com/package/nodemon)                     | Performs hot reloading of the application                                                                                    |
 
 ## Author
 
@@ -98,11 +133,3 @@ Validating:
 
 - Github: [@adelgado0723](https://github.com/adelgado0723)
 - LinkedIn: [@https:\/\/www.linkedin.com\/in\/adelgado0723\/](https://linkedin.com/in/https://www.linkedin.com/in/adelgado0723/)
-
-## Show your support
-
-Give a ⭐️ if this project helped you!
-
----
-
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
