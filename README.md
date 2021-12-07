@@ -37,8 +37,9 @@ Creates a new user account if one does not already exist for the given email
 }
 ```
 
+Upon success, the errors array will be empty and data.user.email will show the newly added user email.
+
 **Successful Response Body:**
-Upon success, the errors array will be empty and data.user.email will show the newly added user email
 
 ```JSON
 {
@@ -81,13 +82,13 @@ Creates a new user account if one does not already exist for the given email
 
 ### Hashed passwords
 
-Server breaches and data theft are common occurences. Storing passwords in a hashed format offers users an added a layer of security.
+Server breaches and data theft are common occurrences. Storing passwords in a hashed format offers users an added a layer of security.
 
-### Uses JSON web tokens to keep track of user sessions
+### JWT Session Menagement
 
 When a user signs up for an account or logs into an existing account, a JSON web token is created that contains an object with that user's email. The object is encrypted using a private key and the token is stored in the user's cookies. When that user attempts to perform an action on the API, their cookies are checked for a valid token and they are considered "logged in" if this token is found.
 
-### Sanitizes and Validates user input
+### Sanitizes and Validates
 
 Sanitizing:
 
@@ -104,7 +105,9 @@ Validating:
 - Validates password contains an uppercase letter
 - Validates password contains a number
 
-### Enforces that passwords must:
+### Enforcing Password Standards
+
+In the worst case scenario data breaches, hackers steal all of a company's hashed password data. Because the cost of cracking a hashed pasword increases exponentially with each character, this measure enforces a base level of hashed password security.
 
 - Be at least 8 characters long
 - Contain an uppercase letter
