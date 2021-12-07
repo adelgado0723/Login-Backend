@@ -2,12 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const connection = require("./db/config.js");
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// 1. Decode JWT to get email for each request
+// Decode JWT to get the user id and identify the session
 app.use((req, res, next) => {
   const { token } = req.cookies;
 
@@ -16,7 +17,6 @@ app.use((req, res, next) => {
       if (!err) {
         req.user = user;
       }
-      // Else they might need a new token
     });
   }
   next();
@@ -31,4 +31,45 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something Broke: " + err.message);
 });
 
-app.listen(process.env.NODE_LOCAL_PORT);
+let shuttingDown = false;
+app.use(function (req, resp, next) {
+  if (!shuttingDown) return next();
+
+  resp.setHeader("Connection", "close");
+  resp
+    .status(503)
+    .json({ errors: ["Server is in the process of restarting"], data: null });
+  console.json({
+    errors: ["Server is in the process of restarting"],
+    data: null,
+  });
+});
+
+function cleanup() {
+  shuttingDown = true;
+  server.close(function () {
+    console.log("Closed out remaining connections.");
+    connection.end();
+    process.exit();
+  });
+
+  setTimeout(function () {
+    console.error("Could not close connections in time, forcing shut down");
+    process.exit(1);
+  }, 30 * 1000);
+}
+
+process.on("SIGINT", cleanup);
+process.on("SIGTERM", cleanup);
+
+const startMessage = `Server started listening on port: ${process.env.NODE_LOCAL_PORT}`;
+let server = app.listen(process.env.NODE_LOCAL_PORT, () => {
+  console.log(startMessage);
+  connection.connect(function (err) {
+    if (err) {
+      console.error("Error connecting to db: " + err.stack);
+      return;
+    }
+    console.log("Connected to database with id: " + connection.threadId);
+  });
+});

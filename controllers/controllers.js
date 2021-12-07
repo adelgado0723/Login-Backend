@@ -2,120 +2,127 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/models.js");
-
 const ONE_DAY_MILLISECS = 1000 * 60 * 60 * 24;
-// These functions should be replaced by calls to a database
-users = [{ email: "Testing!@yahoo.com", password: "test!" }];
-storeUser = (user) => {
-  users.push(user);
-};
-findUser = (email) => {
-  const user = users.find((user) => user.email == email);
-  return user;
-};
-//////////////////////////////////////////////////////////////
-// Get all users
-exports.getUsers = (req, res) => {
+
+// Users Controller
+// Only accessible if Logged in
+exports.getUserEmails = (req, res) => {
   if (req.user && req.user.email) {
-    // TODO: Implement permissions
-    res.status(200).json(users);
+    User.getAllEmails((err, data) => {
+      if (err) {
+        res.status(500).json({ errors: ["Error Getting Users"], data: null });
+      } else {
+        res.status(200).json({ errors: null, data: data });
+      }
+    });
   } else {
-    res.status(401).send("User must log in to view");
+    res.status(401).json({ errors: ["User must log in to view"], data: null });
   }
 };
 
-// SignUp route
-exports.signup = async (req, res) => {
-  const errors = validationResult(req).errors;
-  if (errors.length > 0) {
-    let concatErrors = "";
-    errors.forEach((error) => {
-      concatErrors += error.msg + "\n";
-    });
-    return res
-      .status(400)
-      .send(concatErrors ? concatErrors : "Invalid input provided");
-  }
-  // 1. Check if user already exists
-  const user = findUser(req.body.email);
-  if (user != null) {
-    return res.status(409).send("Email Already In Use");
-  }
-
+const createUser = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    // 2. Create user in database
-    const user = {
-      email: req.body.email,
-      password: hashedPassword,
-    };
-    storeUser(user);
-
-    const dbUserTest = new User({
+    // Create user in database
+    let user = {
+      id: null,
       email: req.body.email,
       passHash: hashedPassword,
-    });
-    User.create(dbUserTest, (err, data) => {
+    };
+    User.create(user, (err, data) => {
       if (err) {
-        res.status(500).send("Error Creating User");
+        res.status(500).json({ errors: ["Error Creating User"], data: null });
+      } else if (data) {
+        // Automatically sign in user after sign up
+        const token = jwt.sign({ email: user.email }, process.env.APP_SECRET, {
+          expiresIn: "2h",
+        });
+
+        // Set JWT as a cookie on the response
+        res.cookie("token", token, {
+          httpOnly: true,
+          maxAge: ONE_DAY_MILLISECS,
+        });
+        res
+          .status(201)
+          .json({ errors: null, data: { user: { email: user.email } } });
       }
     });
+  } catch (err) {
+    res.status(500).json({ errors: ["Server error"], data: null });
+  }
+};
+// SignUp Controller
+exports.signup = async (req, res) => {
+  if (validationResult(req).errors.length) {
+    return res
+      .status(400)
+      .json({ errors: validationResult(req).errors, data: null });
+  }
 
-    // 3. Sign in the user with the credentials they just created.
+  // Check if user already exists
+  User.getByEmail(req.body.email, async function (err, data) {
+    if (err) {
+      res.status(500).json({ errors: ["Error Fetching User"], data: null });
+    } else if (data[0]) {
+      res.status(409).json({ errors: ["Email Already In Use"], data: null });
+    } else {
+      createUser(req, res);
+    }
+  });
+};
+
+const attemptLogin = async (req, res, user) => {
+  try {
+    // Check that their password is correct
+    if ((await bcrypt.compare(req.body.password, user.passHash)) == null) {
+      res.status(401).json({ errors: [loginError], data: null });
+    }
+    // Generate the JWT
     const token = jwt.sign({ email: user.email }, process.env.APP_SECRET, {
-      expiresIn: "30m",
+      expiresIn: "2h",
     });
 
-    // 4. Set JWT as a cookie on the response
+    // Set the Cookie with the token
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: ONE_DAY_MILLISECS,
     });
-    res.status(201).send("User Created Succesfully");
+    const loginMessage = "Login Successful. Welcome " + user.email + "!";
+    res.status(200).json({
+      error: null,
+      data: { message: loginMessage },
+    });
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Server Error");
+    res.status(500).json({ errors: ["Server error"], data: null });
   }
 };
 
-// Login route
+// Login Controller
 exports.login = async (req, res) => {
   const loginError = "Invalid credentials provided";
   const errors = validationResult(req).errors;
   if (errors.length > 0) {
-    return res.status(401).send(loginError);
+    return res.status(401).json({ error: [loginError], data: null });
   }
-  // 1. Look for a user given the email
-  const user = findUser(req.body.email);
-  if (user == null) {
-    return res.status(401).send(loginError);
-  }
-  try {
-    // 2. Check that their password is correct
-    if ((await bcrypt.compare(req.body.password, user.password)) == null) {
-      res.set(401).send(loginError);
+
+  // Look for a user given the email
+  User.getByEmail(req.body.email, function (err, data) {
+    if (err) {
+      // Error in querying database
+      res.status(500).json({ errors: ["Error Fetching User"], data: null });
+    } else if (data[0] == null) {
+      // User doesn't exist
+      res.status(401).json({ errors: [loginError], data: null });
+    } else {
+      attemptLogin(req, res, data[0]);
     }
-    // 3. Generate the JWT
-    const token = jwt.sign({ email: user.email }, process.env.APP_SECRET, {
-      expiresIn: "30m",
-    });
-
-    // 4. Set the Cookie with the token
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: ONE_DAY_MILLISECS,
-    });
-
-    res.status(200).send("Success");
-  } catch (err) {
-    //console.log(error);
-    res.status(500).send();
-  }
+  });
 };
 
-// Logout route
+// Logout Controller
 exports.logout = (req, res) => {
   res.clearCookie("token");
-  res.status(200).send("Logged Out");
+  res.status(200).json({ error: null, data: { message: "Logged Out." } });
 };

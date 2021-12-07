@@ -3,8 +3,8 @@ const loginValidate = require("../utils/validation.js").loginValidate;
 module.exports = (app) => {
   const controllers = require("../controllers/controllers.js");
 
-  // Get all users
-  app.get("/users", controllers.getUsers);
+  // Get all user emails
+  app.get("/users", controllers.getUserEmails);
 
   // SignUp route
   app.post("/signup", loginValidate, controllers.signup);
