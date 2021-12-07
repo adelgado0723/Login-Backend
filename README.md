@@ -130,17 +130,17 @@ Creates a new user account if one does not already exist for the given email
 
 ```JSON
 {
-  "error": null,
+  "errors": null,
   "data": {
     "message": "Login Successful. Welcome [user_email]!"
   }
 }
 ```
 
-| Field    | Type          | Description                                  |
-| -------- | ------------- | -------------------------------------------- |
-| error    | Array[String] | Errors validating or authorizing credentials |
-| password | String        | User password                                |
+| Field  | Type          | Description                                  |
+| ------ | ------------- | -------------------------------------------- |
+| errors | Array[String] | Errors validating or authorizing credentials |
+| data   | String        | User password                                |
 
 ### POST /logout
 
@@ -158,10 +158,10 @@ Creates a new user account if one does not already exist for the given email
 }
 ```
 
-| Field    | Type          | Description           |
-| -------- | ------------- | --------------------- |
-| error    | Array[String] | Registered user email |
-| password | String        | User password         |
+| Field  | Type          | Description                                         |
+| ------ | ------------- | --------------------------------------------------- |
+| errors | Array[String] | Errors during logout                                |
+| data   | Object        | Contains a success message if request is successful |
 
 Note: /logout returns a 200 HTTP status code and the above message whether the user was logged in or not.
 

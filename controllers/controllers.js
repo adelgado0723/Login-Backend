@@ -104,7 +104,7 @@ exports.login = async (req, res) => {
   const loginError = "Invalid credentials provided";
   const errors = validationResult(req).errors;
   if (errors.length > 0) {
-    return res.status(401).json({ error: [loginError], data: null });
+    return res.status(401).json({ errors: [loginError], data: null });
   }
 
   // Look for a user given the email
@@ -124,5 +124,5 @@ exports.login = async (req, res) => {
 // Logout Controller
 exports.logout = (req, res) => {
   res.clearCookie("token");
-  res.status(200).json({ error: null, data: { message: "Logged Out." } });
+  res.status(200).json({ errors: null, data: { message: "Logged Out." } });
 };
