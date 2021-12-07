@@ -63,6 +63,7 @@ process.on("SIGINT", cleanup);
 process.on("SIGTERM", cleanup);
 
 const startMessage = `Server started listening on port: ${process.env.NODE_LOCAL_PORT}`;
+
 let server = app.listen(process.env.NODE_LOCAL_PORT, () => {
   console.log(startMessage);
   connection.connect(function (err) {

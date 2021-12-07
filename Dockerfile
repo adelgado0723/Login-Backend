@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD npm start
+CMD [ "./wait-for-it.UNIX.sh", "mysqldb:3306", "--", "node /usr/src/app/server.js" ]

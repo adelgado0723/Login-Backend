@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to delgado-backend-test-1 👋</h1>
+<h1 align="center">REST interface to a login module using Node.js Express</h1>
 <p>
   <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
   <a href="#" target="_blank">
@@ -8,21 +8,65 @@
 
 ## About
 
-REST endpoints that support user creation, logging in, querying all users if logged in, and logging out.
+Backend server providing endpoints that allow users to:
+
+- Create new users
+- Login with new credentials
+- Query all user emails if logged in (For testing authentication and sessions)
+- Logout
+
+Users are stored in a MySQL database within a Users table that has three fields: id, email, and passHash.
+
+```sql
+CREATE TABLE Users (
+	id VARCHAR(36) NOT NULL PRIMARY KEY,
+	email VARCHAR(60) UNIQUE NOT NULL,
+	passHash VARCHAR(60) NOT NULL
+);
+```
+
+The id is a non sequential unique identifier provided by MySQL's `UUID()` function. This prevents malicious actors from being able to easily iterate through the ids and find others once they have one.
 
 ## Install
 
 ```sh
+git clone https://github.com/adelgado0723/delgado-backend-test-1.git
+
+cd ./delgado-backend-test-1
+
 npm install
+```
+
+## Configure
+
+A ".env" file will be expected in the root folder of the application, where server.js is located. Here is an example of this file. Review each variable and set it according to the environment this is being run in.
+
+```sh
+APP_SECRET=[Secret String for encrypting JWT]
+
+MYSQLDB_HOST=[IP or Domain]
+MYSQLDB_USER=[Database username]
+MYSQLDB_PASSWORD=[Database Password]
+MYSQLDB_DATABASE=[Database name]
+
+# MYSQLDB_LOCAL_PORT is the default used in
+#./config/config.js to establish the databse connection
+MYSQLDB_LOCAL_PORT=[db port on host]
+MYSQLDB_DOCKER_PORT=[db port on host]
+
+NODE_LOCAL_PORT=5000
+NODE_DOCKER_PORT=5000
 ```
 
 ## Usage
 
 ```sh
-npm run start
+docker up --build
 ```
 
-## Endpoints
+## Testing
+
+## Endpoint Documentation
 
 ### POST /signup
 
@@ -32,12 +76,17 @@ Creates a new user account if one does not already exist for the given email
 
 ```JSON
 {
-    "email": "[your_email]",
-    "password": "[your_password]"
+    "email": "[user_email]",
+    "password": "[user_password]"
 }
 ```
 
 Upon success, the errors array will be empty and data.user.email will show the newly added user email.
+
+| Field    | Type   | Description                        |
+| -------- | ------ | ---------------------------------- |
+| email    | String | Email to register                  |
+| password | String | Password meeting specific criteria |
 
 **Successful Response Body:**
 
@@ -45,16 +94,19 @@ Upon success, the errors array will be empty and data.user.email will show the n
 {
   "errors":null,
   "data": { "user": {
-                      "email":"[your_email]"
+                      "email":"[user_email]"
                       }
           }
 }
 ```
 
-| Field  | Type   | Description                                                             |
-| ------ | ------ | ----------------------------------------------------------------------- |
-| errors | Array  | Contains any errors from the process                                    |
-| data   | Object | Contains newly added user data upon success or null when error(s) occur |
+| Field  | Type          | Description                                                             |
+| ------ | ------------- | ----------------------------------------------------------------------- |
+| errors | Array[String] | Errors creating the new user                                            |
+| data   | Object        | Contains newly added user data upon success or null when error(s) occur |
+
+If there are any errors in the process, they will be returned in the errors array and data will have a value of null.
+The new user will be automatically logged in after successful registration.
 
 ### POST /login
 
@@ -64,8 +116,8 @@ Creates a new user account if one does not already exist for the given email
 
 ```JSON
 {
-    "email": "[your_email]",
-    "password": "[your_password]"
+    "email": "[user_email]",
+    "password": "[user_password]"
 }
 ```
 
@@ -74,7 +126,44 @@ Creates a new user account if one does not already exist for the given email
 | email    | String | Registered user email |
 | password | String | User password         |
 
+**Successful Response Body:**
+
+```JSON
+{
+  "error": null,
+  "data": {
+    "message": "Login Successful. Welcome [user_email]!"
+  }
+}
+```
+
+| Field    | Type          | Description                                  |
+| -------- | ------------- | -------------------------------------------- |
+| error    | Array[String] | Errors validating or authorizing credentials |
+| password | String        | User password                                |
+
 ### POST /logout
+
+- Requires no body
+- Returns a message in the data object upon success
+
+**Successful Response Body:**
+
+```JSON
+{
+    "error": null,
+    "data": {
+        "message": "Logged Out."
+    }
+}
+```
+
+| Field    | Type          | Description           |
+| -------- | ------------- | --------------------- |
+| error    | Array[String] | Registered user email |
+| password | String        | User password         |
+
+Note: /logout returns a 200 HTTP status code and the above message whether the user was logged in or not.
 
 ### GET /users
 

@@ -15,6 +15,8 @@ services:
   app:
     depends_on:
       - mysqldb
+    links:
+      - mysqldb:mysqldb
     build: ./
     restart: unless-stopped
     env_file: ./.env
