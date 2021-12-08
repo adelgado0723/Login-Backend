@@ -1,31 +1,17 @@
-<h1 align="center">REST interface to a login module using Node.js Express</h1>
+<h1 align="center">Login Backend With Node.js</h1>
 <p>
   <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
-  <a href="#" target="_blank">
-    <img alt="License: ISC" src="https://img.shields.io/badge/License-ISC-yellow.svg" />
-  </a>
+
 </p>
 
 ## About
 
-Backend server providing endpoints that allow users to:
+Backend server providing endpoints that allow for:
 
-- Create new users
-- Login with new credentials
-- Query all user emails if logged in (For testing authentication and sessions)
+- Creating users through account registration
+- Logging in with newly created credentials
+- Querying all user emails (if logged in)
 - Logout
-
-Users are stored in a MySQL database within a Users table that has three fields: id, email, and passHash.
-
-```sql
-CREATE TABLE Users (
-	id VARCHAR(36) NOT NULL PRIMARY KEY,
-	email VARCHAR(60) UNIQUE NOT NULL,
-	passHash VARCHAR(60) NOT NULL
-);
-```
-
-The id is a non sequential unique identifier provided by MySQL's `UUID()` function. This prevents malicious actors from being able to easily iterate through the ids and find others once they have one.
 
 ## Install
 
@@ -44,23 +30,33 @@ npm install
 A ".env" file will be expected in the root folder of the application, where server.js is located. Here is an example of this file. Review each variable and set it according to the environment this is being run in.
 
 ```sh
-APP_SECRET=[Secret String for encrypting JWT]
-
-MYSQLDB_HOST=[IP or Domain]
-MYSQLDB_USER=[Database username]
-MYSQLDB_PASSWORD=[Database Password]
-MYSQLDB_DATABASE=[Database name]
-
-# MYSQLDB_LOCAL_PORT is the default used in
-#./config/config.js to establish the databse connection
-MYSQLDB_LOCAL_PORT=[db port on host]
-MYSQLDB_DOCKER_PORT=[db port on host]
+APP_SECRET=B5J9tXM3tcmdRwT3
+ENV='DOCKER'
+MYSQLDB_LOCAL_HOST='127.0.0.1'
+MYSQLDB_DOCKER_HOST='mysqldb'
+MYSQLDB_USER=root
+MYSQLDB_PASSWORD=79ruCL8aZEPMW9nJ
+MYSQLDB_DATABASE=user_db
+MYSQLDB_LOCAL_PORT=3307
+MYSQLDB_DOCKER_PORT=3306
 
 NODE_LOCAL_PORT=5000
 NODE_DOCKER_PORT=5000
 ```
 
+If the ENV variable is set to 'DOCKER', the server attempts to connect to the database using the MYSQLDB_DOCKER_HOST host and MYSQLDB_DOCKER_PORT port number. Any other setting of the ENV variable has express use the MYSQLDB_LOCAL_HOST host and MYSQLDB_LOCAL_PORT port number.
+
 ## Usage
+
+Build and run with:
+
+```sh
+docker-compose up --build
+```
+
+or
+
+Run without building:
 
 ```sh
 docker-compose up
@@ -78,8 +74,8 @@ Creates a new user account if one does not already exist for the given email
 
 ```JSON
 {
-    "email": "[user_email]",
-    "password": "[user_password]"
+  "email": "[user_email]",
+  "password": "[user_password]"
 }
 ```
 
@@ -94,11 +90,12 @@ Upon success, the errors array will be empty and data.user.email will show the n
 
 ```JSON
 {
-  "errors":null,
-  "data": { "user": {
-                      "email":"[user_email]"
-                      }
-          }
+	"errors": null,
+	"data": {
+		"user": {
+			"email": "[user_email]"
+		}
+	}
 }
 ```
 
@@ -118,8 +115,8 @@ Logs in with a registered user's username and password
 
 ```JSON
 {
-    "email": "[user_email]",
-    "password": "[user_password]"
+  "email": "[user_email]",
+  "password": "[user_password]"
 }
 ```
 
@@ -132,10 +129,10 @@ Logs in with a registered user's username and password
 
 ```JSON
 {
-  "errors": null,
-  "data": {
-    "message": "Login Successful. Welcome [user_email]!"
-  }
+	"errors": null,
+	"data": {
+		"message": "Login Successful. Welcome [user_email]!"
+	}
 }
 ```
 
@@ -153,10 +150,10 @@ Logs in with a registered user's username and password
 
 ```JSON
 {
-    "error": null,
-    "data": {
-        "message": "Logged Out."
-    }
+	"error": null,
+	"data": {
+		"message": "Logged Out."
+	}
 }
 ```
 
@@ -169,13 +166,57 @@ Note: /logout returns a 200 HTTP status code and the above message whether the u
 
 ### GET /users
 
+This is a login restricted route that returns a list of all the users emails once queried by an authenticated user. It requires no text in the body of the request.
+
+If queried by a user that is logged out, the user emails will not be transmitted and the user receives the following error.
+
+**Unsucessful Response:**
+
+```JSON
+{
+  "errors": [ "User must log in to view" ],
+  "data": null
+}
+```
+
+**Successful Response:**
+
+```JSON
+{
+	"errors": null,
+	"data": {
+		"0": {
+			"email": "adrienne.gutkowski91@hotmail.com"
+		},
+		"1": {
+			"email": "catalina.boyer@yahoo.com"
+		},
+		"2": {
+			"email": "samir_kulas88@yahoo.com"
+		},
+		"3": {
+			"email": "timmy_wiza92@hotmail.com"
+		}
+	}
+}
+```
+
+| Field  | Type          | Description                                                                                              |
+| ------ | ------------- | -------------------------------------------------------------------------------------------------------- |
+| errors | Array[String] | Errors fetching user emails                                                                              |
+| data   | Object        | Contains a list of objects, each keyed by an incrementing sequential index and containing a user's email |
+
 ## Design and Features
+
+### MySQL DB for Storage
+
+Users are stored in a MySQL database within a Users table that has three fields: id, email, and passHash. The id is a non sequential unique identifier provided by MySQL's `UUID()` function. This prevents malicious actors from being able to easily identify other users' ids by iterating through them sequentially. A [script](./sql/createdb.sql) to create this database is available in the sql/ folder.
 
 ### Hashed passwords
 
 Server breaches and data theft are common occurrences. Storing passwords in a hashed format offers users an added a layer of security.
 
-### JWT Session Menagement
+### JWT Session Management
 
 When a user signs up for an account or logs into an existing account, a JSON web token is created that contains an object with that user's email. The object is encrypted using a private key and the token is stored in the user's cookies. When that user attempts to perform an action on the API, their cookies are checked for a valid token and they are considered "logged in" if this token is found.
 
@@ -190,7 +231,7 @@ Validating:
 
 - Validates email is in proper email format
 
-  - i.e. example@example.com
+  - i.e. `example@example.com`
 
 - Validates password is at least 8 characters long
 - Validates password contains an uppercase letter
@@ -198,7 +239,7 @@ Validating:
 
 ### Enforcing Password Standards
 
-In the worst case scenario data breaches, hackers steal all of a company's hashed password data. Because the cost of cracking a hashed pasword increases exponentially with each character, this measure enforces a base level of hashed password security.
+In the worst case scenario data breaches, hackers steal all of a company's hashed password data. Because the cost of cracking a hashed password increases exponentially with each character, this measure enforces a base level of hashed password security.
 
 - Be at least 8 characters long
 - Contain an uppercase letter

@@ -56,9 +56,11 @@ const createUser = async (req, res) => {
 // SignUp Controller
 exports.signup = async (req, res) => {
   if (validationResult(req).errors.length) {
-    return res
-      .status(400)
-      .json({ errors: validationResult(req).errors, data: null });
+    let errorMessages = [];
+    validationResult(req).errors.forEach((error) => {
+      errorMessages.push(error.msg);
+    });
+    return res.status(400).json({ errors: errorMessages, data: null });
   }
 
   // Check if user already exists
@@ -91,7 +93,7 @@ const attemptLogin = async (req, res, user) => {
     });
     const loginMessage = "Login Successful. Welcome " + user.email + "!";
     res.status(200).json({
-      error: null,
+      errors: null,
       data: { message: loginMessage },
     });
   } catch (err) {
