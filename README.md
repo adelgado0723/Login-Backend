@@ -12,10 +12,10 @@ Backend server providing endpoints that allow for:
 ## Install
 
 ```sh
-git clone https://github.com/adelgado0723/delgado-backend-test-1.git;
-cd ./delgado-backend-test-1;
+git clone https://github.com/adelgado0723/delgado-backend-test-1.git
+cd ./delgado-backend-test-1
 
-npm install;
+npm install
 ```
 
 ## Configure
