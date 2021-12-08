@@ -39,6 +39,8 @@ npm install
 
 ## Configure
 
+**_Note: This step can be skipped if using the default .env file provided, but these values should change if this is meant to be used in any sort of public environment._**
+
 A ".env" file will be expected in the root folder of the application, where server.js is located. Here is an example of this file. Review each variable and set it according to the environment this is being run in.
 
 ```sh
@@ -61,7 +63,7 @@ NODE_DOCKER_PORT=5000
 ## Usage
 
 ```sh
-docker up --build
+docker-compose up
 ```
 
 ## Testing
@@ -110,7 +112,7 @@ The new user will be automatically logged in after successful registration.
 
 ### POST /login
 
-Creates a new user account if one does not already exist for the given email
+Logs in with a registered user's username and password
 
 **Request Body:**
 
@@ -137,10 +139,10 @@ Creates a new user account if one does not already exist for the given email
 }
 ```
 
-| Field  | Type          | Description                                  |
-| ------ | ------------- | -------------------------------------------- |
-| errors | Array[String] | Errors validating or authorizing credentials |
-| data   | String        | User password                                |
+| Field  | Type          | Description                                         |
+| ------ | ------------- | --------------------------------------------------- |
+| errors | Array[String] | Errors validating or authorizing credentials        |
+| data   | String        | Contains a success message if request is successful |
 
 ### POST /logout
 

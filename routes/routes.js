@@ -1,4 +1,4 @@
-const loginValidate = require("../utils/validation.js").loginValidate;
+const loginValidate = require("../utils/utils.js").loginValidate;
 
 module.exports = (app) => {
   const controllers = require("../controllers/controllers.js");

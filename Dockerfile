@@ -12,4 +12,10 @@ COPY . .
 
 EXPOSE 5000
 
-CMD [ "./wait-for-it.UNIX.sh", "mysqldb:3306", "--", "node /usr/src/app/server.js" ]
+ENV WAIT_VERSION 2.7.2
+
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
+
+RUN chmod +x /wait
+
+CMD ["npm start"]
