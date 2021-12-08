@@ -1,8 +1,4 @@
 <h1 align="center">Login Backend With Node.js</h1>
-<p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
-
-</p>
 
 ## About
 
@@ -16,16 +12,15 @@ Backend server providing endpoints that allow for:
 ## Install
 
 ```sh
-git clone https://github.com/adelgado0723/delgado-backend-test-1.git
+git clone https://github.com/adelgado0723/delgado-backend-test-1.git;
+cd ./delgado-backend-test-1;
 
-cd ./delgado-backend-test-1
-
-npm install
+npm install;
 ```
 
 ## Configure
 
-**_Note: This step can be skipped if using the default .env file provided, but these values should change if this is meant to be used in any sort of public environment._**
+**_Note: This step can be skipped for testing purposes. The .env file is provided here, but these values should change if this is meant to be used in any sort of public environment._**
 
 A ".env" file will be expected in the root folder of the application, where server.js is located. Here is an example of this file. Review each variable and set it according to the environment this is being run in.
 
@@ -220,11 +215,11 @@ Users are stored in a MySQL database within a Users table that has three fields:
 
 ### Hashed passwords
 
-Server breaches and data theft are common occurrences. Storing passwords in a hashed format offers users an added a layer of security.
+Server breaches and data theft are common occurrences. Storing passwords in a hashed format offers users an added a layer of security so that if hackers manage to steal users' hashed passwords, they then have to spend time trying to crack them. If this security measure is combined with a strong password policy, it becomes very difficult if not impossible to crack the hashes with a brute force attack due to the time complexity involved.
 
 ### JWT Session Management
 
-When a user signs up for an account or logs into an existing account, a JSON web token is created that contains an object with that user's email. The object is encrypted using a private key and the token is stored in the user's cookies. When that user attempts to perform an action on the API, their cookies are checked for a valid token and they are considered "logged in" if this token is found.
+If a user signs up for an account or logs into an existing account, a JSON web token is created containing an object with that user's email. The object is encrypted using a private key and the token is stored in the user's cookies. When that user attempts to perform an action on the API, their cookies are checked for a valid token and they are considered "logged in" if this token is found.
 
 ### Sanitizes and Validates
 
