@@ -64,6 +64,12 @@ docker-compose up
 
 ## Testing
 
+### Endpoint tests
+
+A postman collection containing tests for the different endpoints can be found [here](./tests/postman/delgado-backend-test-1.postman_collection.json).
+
+To test simply import and run the collection in Postman.
+
 ## Endpoint Documentation
 
 ### POST /signup
@@ -248,6 +254,8 @@ In the worst case scenario data breaches, hackers steal all of a company's hashe
 ## To Do:
 
 - Limit login Attempts. Although there are tools that implement this, like [express-brute](https://www.npmjs.com/package/express-brute), it could instead be delegated to a WAF.
+
+- Unit tests. While the endpoint tests are helpful for testing the routes as integrated components, unit tests would help ensure that the individual code components (functions) each work as intended. This could be added with a framework like [jest](https://github.com/facebook/jest).
 
 ## Dependencies
 
