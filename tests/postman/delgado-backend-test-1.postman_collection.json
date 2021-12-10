@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "680a589f-fabf-4b85-a2b3-4091e4d0cdf1",
+		"_postman_id": "90fbae3e-2762-44d0-8041-984d3ed57923",
 		"name": "API Tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -515,7 +515,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"Test1234\"\r\n}",
+							"raw": "{\r\n    \"email\": \"{{existing_user}}\",\r\n    \"password\": \"{{existing_user_pass}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -626,7 +626,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"Test1234\"\r\n}",
+							"raw": "{\r\n    \"email\": \"{{existing_user}}\",\r\n    \"password\": \"{{existing_user_pass}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
