@@ -10,8 +10,10 @@ services:
       - MYSQL_DATABASE=$MYSQLDB_DATABASE
     ports:
       - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+    command: --init-file /usr/app/sql/createdb.sql
     volumes:
       - db:/var/lib/mysql
+      - ./sql/createdb.sql:/usr/app/sql/createdb.sql
   app:
     depends_on:
       - mysqldb

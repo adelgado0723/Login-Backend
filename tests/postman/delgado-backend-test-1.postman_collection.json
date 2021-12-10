@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "90fbae3e-2762-44d0-8041-984d3ed57923",
+		"_postman_id": "f7a85727-70d2-4d9f-94fb-293801e608bd",
 		"name": "API Tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -425,7 +425,10 @@
 									"pm.test(\"response must have a valid JSON body\", function () {\r",
 									"     pm.response.to.be.withBody;\r",
 									"     pm.response.to.be.json;\r",
-									"});"
+									"});\r",
+									"\r",
+									"var jsonData = JSON.parse(responseBody);\r",
+									"pm.collectionVariables.set(\"existing_user\", jsonData.data.user.email);"
 								],
 								"type": "text/javascript"
 							}
@@ -448,7 +451,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"password\": \"Testtest1\"\r\n}",
+							"raw": "{\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"password\": \"{{existing_user_pass}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -597,7 +600,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Signup Status Test\", function () {\r",
+									"pm.test(\"Login Status Test\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"pm.test(\"response must have a valid JSON body\", function () {\r",
