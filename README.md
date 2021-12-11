@@ -9,7 +9,11 @@ Backend server providing endpoints that allow for:
 - Querying all user emails (if logged in)
 - Logout
 
+This project is now live at http://45.63.107.246/
+
 ## Install
+
+**_Note: Node.JS and Docker are prerequisites to executing these commands._**
 
 ```sh
 git clone https://github.com/adelgado0723/delgado-backend-test-1.git
@@ -20,7 +24,7 @@ npm install
 
 ## Configure
 
-**_Note: This step can be skipped for testing purposes. The .env file is provided here, but these values should change if this is meant to be used in any sort of public environment._**
+**_Note: You can use the .env.example file provided. Just remove the ".example" at the end and modify the values._**
 
 A ".env" file will be expected in the root folder of the application, where server.js is located. Here is an example of this file. Review each variable and set it according to the environment this is being run in.
 
