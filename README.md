@@ -9,8 +9,6 @@ Backend server providing endpoints that allow for:
 - Querying all user emails (if logged in)
 - Logout
 
-This project is now live at http://45.63.107.246/
-
 ## Install
 
 **_Note: Node.JS and Docker are prerequisites to executing these commands._**
